@@ -1,0 +1,17 @@
+é um simples bypass NX
+ou seja nao podemos passar nenhum shellcode diretamente na stack
+por sorte se olharmos as strings com:
+
+no radare2: iz
+com strings: strings -a -t x split
+
+podemos notar que há uma string: /bin/cat flag.txt
+então basta nos passarmos essa string para a system()
+mas como saber aonde essa string está? o iz do r2 nos diz isso
+
+depois disso basta acharmos um gadget: pop rdi ; ret
+
+podemos ver com o nm tambem labels: usefulFunction e usefulString
+respectivamente: chama a função, argumento (/bin/cat flag.txt)
+
+*obs: podemos ver informações do binario com: rabin2 -I split

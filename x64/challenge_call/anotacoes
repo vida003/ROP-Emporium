@@ -1,0 +1,15 @@
+Então basicamente o desafio fala para nós as funções com os argumentos que devemos usar
+se ele nn falasse precisariamos aplicar uma engenharia reversa, isso ficaria 100x mais facil usando o GHIDRA
+
+Sabendo de tudo isso basta fazer o exploit comum
+Mas pera... como saberemos os endereço dessas funções?
+Usando o radare2
+r2 <binario>
+command> aas
+command> afl
+
+aas = analisa os simbolos 
+afl = lista as funções
+
+sem o aas antes o afl nao funciona já que os simbolos nao foram analizados
+apos termos os simbolos o afl só retorna os simbolos correspondentes de funções
